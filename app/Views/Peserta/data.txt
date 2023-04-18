@@ -1,0 +1,221 @@
+<td><?= anchor('peserta/detail/' . $p['no_peserta'], 'detail', 'class="btn btn-info"') ?>
+    <br>
+    <a href="peserta/delete/<?= $p['no_peserta']; ?>" class="btn btn-danger mt-1 inline" onclick="return confirm('Anda yakin mau menghapus data ini ?')">delete</a>
+    <?= anchor('peserta/edit/' . $p['no_peserta'], 'update', 'class="btn btn-warning mt-1", style="inline"') ?>
+</td>
+
+public function delete($no_peserta)
+    {
+        $this->pesertaModel->delete($no_peserta);
+        echo
+        '<script>
+            alert("Data berhasil di hapus");
+            window.location="' . base_URL('Peserta') . '"
+        </script>';
+    }
+
+     function edit($no_peserta)
+    {
+        $peserta = $this->pesertaModel->find($no_peserta);
+        if (empty($peserta)) {
+            throw new \CodeIgniter\Exceptions\PageNotFoundException('Data Peserta Tidak ditemukan !');
+        }
+        $data['peserta'] = $peserta;
+        return view('Peserta/EditPeserta', $data);
+    }
+
+
+    public function update($no_peserta)
+    {
+        if (!$this->validate(
+            [
+                'nama' => ['label' => 'nama', 'rules' => 'required|max_length[50]'],
+                'no_peserta' => ['label' => 'no_peserta', 'rules' => 'required|max_length[50]'],
+                'password' => ['label' => 'Password', 'rules' => 'required|min_length[6]|max_length[12]'],
+                'email'    => ['label' => 'email', 'rules' => 'required|valid_email'],
+                'gender' => ['label' => 'gender', 'rules' => 'required'],
+                'alamat' => ['label' => 'alamat', 'rules' => 'required'],
+                'ttl' => ['label' => 'ttl', 'rules' => 'required'],
+            ],
+            [
+                'nama'    => ['required' => 'Anda harus mengisi nama lengkap anda',],
+                'no_peserta' => ['required'    => 'Anda harus mengisi Username',],
+                'password'    => ['required' => 'Password min terdiri dari 6 karakter dan  max 12 karakter',],
+                'email'    => ['required' => 'Memasukkan email yang valid',],
+                'alamat'    => ['required' => 'Masukkan alamat dengan detail',],
+                'gender'    => ['required' => 'Silahkan pilih gender Anda',],
+                'ttl'    => ['required' => 'Memasukkan tempat dan tanggal lahir sesuai KK',],
+            ]
+        )) {
+            session()->setFlashdata('error', $this->validator->listErrors());
+            return redirect()->back();
+        }
+
+        $this->pesertaModel->update(
+            $no_peserta,
+            [
+                'nama' => $this->request->getPost('nama'),
+                'no_peserta' => $this->request->getPost('no_peserta'),
+                'email' => $this->request->getPost('email'),
+                'password' => $this->request->getPost('password'),
+                'sekolah' => $this->request->getPost('sekolah'),
+                'tmp_lahir' => $this->request->getPost('tmp_lahir'),
+                'ttl' => $this->request->getPost('ttl'),
+                'alamat' => $this->request->getPost('alamat'),
+                'nomor' => $this->request->getPost('nomor'),
+                'prodi' => $this->request->getPost('prodi'),
+                'gender' => $this->request->getPost('gender'),
+                'status' => $this->request->getPost('status'),
+                'ujian' => $this->request->getPost('ujian')
+            ]
+        );
+        echo
+        '<script>
+            alert("Sukses Update Data");
+            window.location="' . base_URL('Peserta') . '"
+        </script>';
+    }
+
+
+     <?php endif; ?>
+            <form method="post" action="/peserta/update/<?= $peserta['no_peserta'] ?>">
+                <?= csrf_field(); ?>
+                <div class="form-group">
+                    <label for="nama">Nama Lengkap</label>
+                    <input type="text" class="form-control" id="nama" name="nama" value="<?= $peserta['nama']; ?>">
+                </div>
+                <div class="form-group">
+                    <label for="no_peserta">Nomor Peserta</label>
+                    <input type="text" class="form-control" id="no_peserta" name="no_peserta" value="<?= $peserta['no_peserta']; ?>">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="text" class="form-control" id="email" name="email" value="<?= $peserta['email']; ?>">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="text" class="form-control" id="password" name="password" value="<?= $peserta['password']; ?>">
+                </div>
+                <div class="form-group">
+                    <label for="sekolah">Sekolah</label>
+                    <input type="text" class="form-control" id="sekolah" name="sekolah" value="<?= $peserta['sekolah'];  ?>" />
+                </div>
+                <div class="form-group">
+                    <label for="tmp_lahir">Tempat Lahir</label>
+                    <input value="<?= $peserta['tmp_lahir']; ?>" type="text" class="form-control" id="tmp_lahir" name="tmp_lahir">
+                </div>
+                <div class="form-group">
+                    <label for="ttl">Tanggal Lahir</label>
+                    <input value="<?= $peserta['ttl']; ?>" type="date" class="form-control" id="ttl" name="ttl">
+                </div>
+                <div class="form-group">
+                    <label for="alamat">Alamat Lengkap</label>
+                    <textarea name="alamat" id="" class="form-control" cols="30" rows="10"><?= $peserta['alamat']; ?>"</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="nomor">No. Handphone</label>
+                    <input type="text" class="form-control" id="nomor" name="nomor" value="<?= $peserta['nomor'];  ?>" />
+                </div>
+                <div class="form-group">
+                    <label for="prodi">Jenis Ujian</label>
+                    <select name="prodi" class="form-control" id="prodi">
+                        <option value="SAINTEK" <?= ($peserta['prodi'] == "SAINTEK" ? "selected" : ""); ?>>SAINTEK</option>
+                        <option value="SOSHUM" <?= ($peserta['prodi'] == "SOSHUM" ? "selected" : ""); ?>>SOSHUM</option>
+                        <option value="CAMPURAN" <?= ($peserta['prodi'] == "CAMPURAN" ? "selected" : ""); ?>>CAMPURAN</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="gender">Jenis Kelamin</label> <br>
+                    <input type="radio" name="gender" value="Laki - Laki" <?php if ($peserta['gender'] == 'Laki - Laki') echo 'checked' ?>> Laki - Laki
+                    <input type="radio" name="gender" value="Perempuan" <?php if ($peserta['gender'] == 'Perempuan') echo 'checked' ?>> Perempuan
+                </div>
+                <div class="form-group">
+                    <label for="status">Status</label> <br>
+                    <input type="hidden" id="status" name="status" value="Non-Aktif">
+                    <input type="checkbox" id="status" name="status" value="Aktif" <?php if ($peserta['status'] == 'Aktif') echo 'checked' ?>> Aktif
+                </div>
+                <input type="hidden" class="form-control" id="status" name="ujian" value="<?= $peserta['ujian'];  ?>" />
+                <div class="form-group">
+                    <input type="submit" value="Update" class="btn btn-info" />
+                </div>
+            </form> <?php endif; ?>
+            <form method="post" action="/peserta/update/<?= $peserta['no_peserta'] ?>">
+                <?= csrf_field(); ?>
+                <div class="form-group">
+                    <label for="nama">Nama Lengkap</label>
+                    <input type="text" class="form-control" id="nama" name="nama" value="<?= $peserta['nama']; ?>">
+                </div>
+                <div class="form-group">
+                    <label for="no_peserta">Nomor Peserta</label>
+                    <input type="text" class="form-control" id="no_peserta" name="no_peserta" value="<?= $peserta['no_peserta']; ?>">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="text" class="form-control" id="email" name="email" value="<?= $peserta['email']; ?>">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="text" class="form-control" id="password" name="password" value="<?= $peserta['password']; ?>">
+                </div>
+                <div class="form-group">
+                    <label for="sekolah">Sekolah</label>
+                    <input type="text" class="form-control" id="sekolah" name="sekolah" value="<?= $peserta['sekolah'];  ?>" />
+                </div>
+                <div class="form-group">
+                    <label for="tmp_lahir">Tempat Lahir</label>
+                    <input value="<?= $peserta['tmp_lahir']; ?>" type="text" class="form-control" id="tmp_lahir" name="tmp_lahir">
+                </div>
+                <div class="form-group">
+                    <label for="ttl">Tanggal Lahir</label>
+                    <input value="<?= $peserta['ttl']; ?>" type="date" class="form-control" id="ttl" name="ttl">
+                </div>
+                <div class="form-group">
+                    <label for="alamat">Alamat Lengkap</label>
+                    <textarea name="alamat" id="" class="form-control" cols="30" rows="10"><?= $peserta['alamat']; ?>"</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="nomor">No. Handphone</label>
+                    <input type="text" class="form-control" id="nomor" name="nomor" value="<?= $peserta['nomor'];  ?>" />
+                </div>
+                <div class="form-group">
+                    <label for="prodi">Jenis Ujian</label>
+                    <select name="prodi" class="form-control" id="prodi">
+                        <option value="SAINTEK" <?= ($peserta['prodi'] == "SAINTEK" ? "selected" : ""); ?>>SAINTEK</option>
+                        <option value="SOSHUM" <?= ($peserta['prodi'] == "SOSHUM" ? "selected" : ""); ?>>SOSHUM</option>
+                        <option value="CAMPURAN" <?= ($peserta['prodi'] == "CAMPURAN" ? "selected" : ""); ?>>CAMPURAN</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="gender">Jenis Kelamin</label> <br>
+                    <input type="radio" name="gender" value="Laki - Laki" <?php if ($peserta['gender'] == 'Laki - Laki') echo 'checked' ?>> Laki - Laki
+                    <input type="radio" name="gender" value="Perempuan" <?php if ($peserta['gender'] == 'Perempuan') echo 'checked' ?>> Perempuan
+                </div>
+                <div class="form-group">
+                    <label for="status">Status</label> <br>
+                    <input type="hidden" id="status" name="status" value="Non-Aktif">
+                    <input type="checkbox" id="status" name="status" value="Aktif" <?php if ($peserta['status'] == 'Aktif') echo 'checked' ?>> Aktif
+                </div>
+                <input type="hidden" class="form-control" id="status" name="ujian" value="<?= $peserta['ujian'];  ?>" />
+                <div class="form-group">
+                    <input type="submit" value="Update" class="btn btn-info" />
+                </div>
+            </form>
+
+
+             <div class="form-group">
+                    <label for="nomor">No. Handphone</label>
+                    <input type="text" class="form-control" id="nomor" name="nomor" value="<?= $peserta['nomor'];  ?>" />
+                </div>
+                <div class="form-group">
+                    <label for="prodi">Jenis Ujian</label>
+                    <select name="prodi" class="form-control" id="prodi">
+                        <option value="SAINTEK" <?= ($peserta['prodi'] == "SAINTEK" ? "selected" : ""); ?>>SAINTEK</option>
+                        <option value="SOSHUM" <?= ($peserta['prodi'] == "SOSHUM" ? "selected" : ""); ?>>SOSHUM</option>
+                        <option value="CAMPURAN" <?= ($peserta['prodi'] == "CAMPURAN" ? "selected" : ""); ?>>CAMPURAN</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="status">Status</label> <br>
+                    <input type="hidden" id="status" name="status" value="Non-Aktif">
+                    <input type="checkbox" id="status" name="status" value="Aktif" <?php if ($peserta['status'] == 'Aktif') echo 'checked' ?>> Aktif
+                </div>
